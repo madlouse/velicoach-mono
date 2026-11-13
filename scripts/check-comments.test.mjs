@@ -34,6 +34,7 @@ test("井号行尾注释不通过", () => {
   assert.equal(run("scripts/x.sh", "npm ci  # 安装依赖").length, 1);
   assert.equal(run("scripts/x.sh", "echo it's # note").length, 1);
   assert.equal(run("scripts/x.yml", "runs-on: ubuntu-24.04 # 固定版本").length, 1);
+  assert.equal(run("scripts/x.py", 'p = """模板', "里面 # 不算", '"""  # 结尾这句算').length, 1);
 });
 
 test("井号在字符串、shebang、网址和 shell 语法里不算注释，行尾 why 和工具指令照旧放行", () => {
@@ -48,6 +49,9 @@ test("井号在字符串、shebang、网址和 shell 语法里不算注释，行
   assert.deepEqual(run("scripts/x.sh", "echo '# 不是注释' \"#\""), []);
   assert.deepEqual(run("scripts/x.sh", "echo $((16#ff))"), []);
   assert.deepEqual(run("scripts/x.yml", "color: '#fff'"), []);
+  assert.deepEqual(run("scripts/x.py", 'payload = """literal # value', "# heading inside", '"""'), []);
+  assert.deepEqual(run("scripts/x.py", "doc = '''a # b'''"), []);
+  assert.deepEqual(run("scripts/x.sh", "printf '%s\\n' foo\\ #bar"), []);
 });
 
 test("配置之外的路径和换行的乘号不管", () => {
