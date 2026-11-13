@@ -6,7 +6,7 @@
 
 **核心体验：** 一站、一键、一秒；拿得出手参评设计奖项的完成度，苹果设计语言和玻璃材质，中英双语。
 
-**阶段（2026-11-13）：** v1 开发中。PRD v2.0，关口三 b（规格和拆票）11-12 通过；PR 进集成分支 feature/v1，关口四通过后由产品负责人确认一次合并进 site。
+**阶段（2026-11-13）：** v1 开发中。PRD v2.0，关口三 b（规格和拆票）11-12 通过；PR 进集成分支 feature/v1，关口四通过后由主频道合并进 site。
 
 ## 去哪读
 
@@ -27,7 +27,7 @@
 
 - **入口：** [AGENTS.project.md](https://github.com/madlouse/velicoach/blob/feature/v1/AGENTS.project.md)（`AGENTS.md` 是沙箱契约，不改）；技能在 `.grok/skills/`，写内容用 velicoach-content，改界面用 velicoach-layout，收录文章用 article-pipeline。
 - **完成：** `npm test`、`npm run lint`、`npm run check:terms`、`npm run check:vague`、`npm run check:voice` 通过；中英两版齐全；合并脚本另跑文档先行和注释两项共享检查。
-- **合并：** 只走合并脚本；分支只用 `feat/`、`fix/`、`content/`、`obs/`、`chore/` 五种前缀；PR 说明第一行写 `类别：…`，类别决定要几份冷评审。
+- **合并：** 只由主频道审合（[工程规范](../standards/engineering.md)「分支和合并」），合并脚本里的检查照跑；分支只用 `feat/`、`fix/`、`content/`、`obs/`、`chore/` 五种前缀；PR 说明第一行写 `类别：…`，类别决定要几份冷评审。
 - **托管：** Vercel；velicoach.com 按路径分给主站和 Veli。频道 velicoach。
 - **评论：** Agent 写的评论首行带 `<!-- vc-bot role=<角色> -->`。
 

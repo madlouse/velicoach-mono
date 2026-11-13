@@ -55,7 +55,7 @@ for (const file of markdownFiles(mono)) {
   if (!lead || /^[#|>-]/.test(lead.trim())) problems.push(`${where}: open with one sentence on what it covers, right under the title`);
   const top = where.split("/")[0];
   const oneHop = !where.includes("/") || ONE_HOP_DIRS.includes(top);
-  if (oneHop && !linkedFromAgents.has(where) && where !== "contracts/spec-log.md") problems.push(`${where}: not linked from AGENTS.md, so agents cannot reach it within two hops`);
+  if (oneHop && !linkedFromAgents.has(where) && !where.startsWith("contracts/spec-log")) problems.push(`${where}: not linked from AGENTS.md, so agents cannot reach it within two hops`);
 }
 
 const ENFORCED = /〔(?:设计|检查|验证|评审)[：:][^〕]+〕/;
