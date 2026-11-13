@@ -20,7 +20,7 @@ Velicoach 是 AGI 路上的陪练：先站稳（Veli），再看清（主站文�
 3. 种星词在家长同意和数据托管定下之前，只从主站链过去，不共享账号，不进周报（[ADR-0001](adr/0001-one-identity-and-family.md)）。〔设计：种星词用自己的 Supabase 项目〕
 4. 给孩子的 AI 不做开放对话，只给生成后可审的内容。〔评审：要判断内容的性质〕
 5. 智能体对外只给工具和数据，敏感数据不出边界（[ADR-0003](adr/0003-agent-access-boundary.md)）。〔评审：工具还没写〕
-6. 执行者只交 PR，不合并；合并前由 Claude 做效果评审（[contracts/task.md](contracts/task.md)）。〔检查：Veli、主站的合并脚本；种星词还没有，靠评审〕
+6. 频道和执行者只交 PR，只有主频道评审并合并（[工程规范](standards/engineering.md)）。〔评审：合并前把关〕
 7. E2E 只发现问题，不改源码、案例和测试框架；修复归写代码的 Agent。〔检查：check-role-paths，产品接入后〕
 
 ## 按任务读哪份
@@ -35,7 +35,7 @@ Velicoach 是 AGI 路上的陪练：先站稳（Veli），再看清（主站文�
 | E2E、验收、覆盖率 | [verify/README.md](verify/README.md) |
 | 对外文字、术语 | [standards/content.md](standards/content.md)、[glossary.md](glossary.md) |
 | 改账号、路由、token、MCP 工具、反馈库 | [map/repos.md](map/repos.md) 的共享契约，再读 adr/ |
-| 派活、选模型 | [contracts/task.md](contracts/task.md) |
+| 派活、选模型、要人定的取舍 | [contracts/task.md](contracts/task.md) |
 | 定价、广告；排期 | [business.md](business.md)；[roadmap.md](roadmap.md) |
 | 改跨产品规范、契约、共享脚本 | [contracts/spec-change.md](contracts/spec-change.md)，记录在 [spec-log.md](contracts/spec-log.md) |
 | 在本手册加文档、调结构 | [ADR-0004](adr/0004-how-agents-read-the-handbook.md) |
