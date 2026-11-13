@@ -17,8 +17,11 @@ const PRODUCTS = [
 
 const CARD_ROWS = ["需求（PRD）", "技术方案", "运行和环境"];
 const SHARED_SCRIPTS = ["check-doc-first.mjs", "check-comments.mjs"];
+const OPTIONAL_SCRIPTS = ["check-role-paths.mjs", "check-e2e-trace.mjs"];
+const VENDORED = "skills/pstack";
 const CONFIG = ".velicoach-checks.json";
 const CONFIG_KEYS = { docFirst: ["code", "docs", "refs"], comments: ["paths"] };
+const OPTIONAL_KEYS = { roles: ["source", "e2eCore", "e2eCases"], e2eTrace: ["prd", "cases"] };
 const DOC_LIMIT = 6144;
 const ONE_HOP_DIRS = ["standards", "contracts", "adr"];
 const problems = [];
@@ -29,6 +32,7 @@ function markdownFiles(dir) {
   for (const name of readdirSync(dir)) {
     if (name.startsWith(".") || name === "node_modules") continue;
     const p = join(dir, name);
+    if (p === join(mono, VENDORED)) continue;
     if (statSync(p).isDirectory()) out.push(...markdownFiles(p));
     else if (name.endsWith(".md")) out.push(p);
   }
@@ -63,6 +67,11 @@ for (const [where, section] of ruleFiles) {
     if (/^\d+\. /.test(line) && !ENFORCED.test(line)) problems.push(`${where}: rule without 〔设计/检查/验证/评审：…〕, say how it is enforced: ${line.slice(0, 40)}`);
   }
 }
+
+const vendored = readdirSync(join(mono, VENDORED)).filter((n) => statSync(join(mono, VENDORED, n)).isDirectory());
+const verdicts = new Map([...readFileSync(join(mono, "skills", "README.md"), "utf8").matchAll(/^\| `([\w-]+)` \| ([^|]+?) \|/gm)].map((m) => [m[1], m[2]]));
+for (const name of vendored) if (verdicts.get(name) !== "收录") problems.push(`${VENDORED}/${name}: skills/README.md has no「收录」row for it; record why it was adopted, or remove it`);
+for (const [name, verdict] of verdicts) if (verdict === "收录" && !vendored.includes(name)) problems.push(`skills/README.md marks ${name} 收录, but ${VENDORED}/${name} is missing`);
 
 const PRODUCT_LINK = /^https:\/\/github\.com\/madlouse\/([\w.-]+)\/(?:blob|tree)\/([^#?]+)/;
 for (const file of markdownFiles(mono)) {
@@ -122,6 +131,10 @@ for (const { repo, file } of PRODUCTS) {
     if (!existsSync(copy)) problems.push(`${repo}: scripts/${script} is missing`);
     else if (readFileSync(copy, "utf8") !== shared[script]) problems.push(`${repo}: scripts/${script} differs from velicoach-mono/scripts/${script}; change it here first (contracts/spec-change.md)`);
   }
+  for (const script of OPTIONAL_SCRIPTS) {
+    const copy = join(dir, "scripts", script);
+    if (existsSync(copy) && readFileSync(copy, "utf8") !== readFileSync(join(mono, "scripts", script), "utf8")) problems.push(`${repo}: scripts/${script} differs from velicoach-mono/scripts/${script}; change it here first (contracts/spec-change.md)`);
+  }
   const configPath = join(dir, CONFIG);
   if (!existsSync(configPath)) problems.push(`${repo}: ${CONFIG} is missing`);
   else {
@@ -134,6 +147,15 @@ for (const { repo, file } of PRODUCTS) {
         }
         for (const list of Object.values(config[section] ?? {})) for (const re of list) new RegExp(re);
       }
+      for (const [section, keys] of Object.entries(OPTIONAL_KEYS)) {
+        if (!config[section]) continue;
+        for (const key of keys) {
+          const list = config[section][key];
+          if (!Array.isArray(list) || list.length === 0) problems.push(`${repo}: ${CONFIG} ${section} needs a non-empty ${key} list`);
+          else for (const re of list) new RegExp(re);
+        }
+        if (section === "e2eTrace") new RegExp(config.e2eTrace.id ?? "(?!)");
+      }
     } catch (e) {
       problems.push(`${repo}: ${CONFIG} does not parse: ${e.message}`);
     }
@@ -144,7 +166,10 @@ for (const { repo, file } of PRODUCTS) {
   if (existsSync(skillsDir)) {
     for (const name of readdirSync(skillsDir)) {
       const skill = join(skillsDir, name, "SKILL.md");
-      if (existsSync(skill)) scanned.push(skill);
+      if (!existsSync(skill)) continue;
+      scanned.push(skill);
+      const ours = join(mono, VENDORED, name, "SKILL.md");
+      if (existsSync(ours) && readFileSync(ours, "utf8") !== readFileSync(skill, "utf8")) notes.add(`${repo}: skill ${name} differs from velicoach-mono/${VENDORED}/${name} (a fork or a different skill with the same name; see skills/README.md)`);
     }
   }
   for (const f of scanned) {

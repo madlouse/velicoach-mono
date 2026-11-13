@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: doc-first and comments
+      - name: velicoach checks
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -20,7 +20,7 @@ jobs:
         run: |
           printf '%s\n' "$BODY" > "$RUNNER_TEMP/body.txt"
           status=0
-          for check in check-doc-first check-comments; do
+          for check in check-doc-first check-comments check-role-paths check-e2e-trace; do
             if git show "$BASE:scripts/$check.mjs" > "$RUNNER_TEMP/$check.mjs" 2>/dev/null; then
               node "$RUNNER_TEMP/$check.mjs" "$BASE" "$HEAD_SHA" "$RUNNER_TEMP/body.txt" || status=1
             else
