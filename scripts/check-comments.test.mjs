@@ -57,6 +57,39 @@ test("井号在字符串、shebang、网址和 shell 语法里不算注释，行
   assert.deepEqual(run("scripts/x.sh", "printf '%s\\n' foo\\ #bar"), []);
 });
 
+test("普通字符串里的三引号不会关掉后面的检查", () => {
+  assert.equal(run("scripts/x.py", `_ = "'''"`, "x = 1  # note").length, 1);
+  assert.equal(run("scripts/x.toml", `a = '"""'`, "# note").length, 1);
+});
+
+test("工具指令按完整格式放行，可以连写", () => {
+  assert.deepEqual(run("scripts/x.py", "x = 1  # pylint: disable=invalid-name,unused-import"), []);
+  assert.deepEqual(run("scripts/x.py", "x = f()  # pyright: ignore[reportGeneralTypeIssues]"), []);
+  assert.deepEqual(run("scripts/x.py", "x = 1  # fmt: skip"), []);
+  assert.deepEqual(run("scripts/x.py", "import a  # isort: skip"), []);
+  assert.deepEqual(run("scripts/x.py", "run(cmd)  # nosec B602, B607"), []);
+  assert.deepEqual(run("scripts/x.py", "# mypy: ignore-errors"), []);
+  assert.deepEqual(run("scripts/x.py", "xs = []  # type: List[int]"), []);
+  assert.deepEqual(run("scripts/x.py", "y = g()  # type: ignore[attr-defined]  # noqa: E501"), []);
+  assert.deepEqual(run("scripts/x.py", "x = 1  # why: 上游 issue #123 还没修"), []);
+  assert.deepEqual(run("scripts/x.yml", "key: value  # yamllint disable-line rule:line-length"), []);
+  assert.deepEqual(run("scripts/x.sh", "echo $a  # shellcheck disable=SC2086"), []);
+  assert.deepEqual(run("supabase/m.sql", "select 1;  -- noqa: L010"), []);
+});
+
+test("指令或 why 后面夹带普通注释不通过", () => {
+  assert.equal(run("scripts/x.py", "import a  # noqa: E402  (导入时顺带刷新)").length, 1);
+  assert.equal(run("scripts/x.py", "import a  # noqa 随便写").length, 1);
+  assert.equal(run("scripts/x.py", "run(cmd)  # nosec 我确定安全").length, 1);
+  assert.equal(run("scripts/x.py", "x = 1  # fmt: skip 因为太长").length, 1);
+  assert.equal(run("scripts/x.py", "x = 1  # type: 随便写").length, 1);
+  assert.equal(run("scripts/x.py", "x = 1  # why: 上游 bug # 顺便说明").length, 1);
+  assert.equal(run("scripts/x.sh", "echo $a  # shellcheck disable=SC2086 顺便说明").length, 1);
+  assert.equal(run("src/a.ts", "// prettier-ignore 顺便说明").length, 1);
+  assert.equal(run("src/a.ts", "// why: Safari 的 bug // 再说一句").length, 1);
+  assert.equal(run("supabase/m.sql", "select 1;  -- noqa 随便").length, 1);
+});
+
 test("配置之外的路径和换行的乘号不管", () => {
   assert.deepEqual(run("docs/a.md", "// 随便写"), []);
   assert.deepEqual(run("src/a.ts", "const x = a", "  * b;"), []);
