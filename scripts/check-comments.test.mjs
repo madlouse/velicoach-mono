@@ -28,6 +28,28 @@ test("工具指令、字符串、网址和配置里允许的写法不算注释",
   assert.deepEqual(run("scripts/x.mjs", "#!/usr/bin/env node"), []);
 });
 
+test("井号行尾注释不通过", () => {
+  assert.equal(run("scripts/x.py", "x = 1  # note").length, 1);
+  assert.equal(run("scripts/x.py", 'x = "a"# note').length, 1);
+  assert.equal(run("scripts/x.sh", "npm ci  # 安装依赖").length, 1);
+  assert.equal(run("scripts/x.sh", "echo it's # note").length, 1);
+  assert.equal(run("scripts/x.yml", "runs-on: ubuntu-24.04 # 固定版本").length, 1);
+});
+
+test("井号在字符串、shebang、网址和 shell 语法里不算注释，行尾 why 和工具指令照旧放行", () => {
+  assert.deepEqual(run("scripts/x.py", "#!/usr/bin/env python3"), []);
+  assert.deepEqual(run("scripts/x.py", 'print("# not", \'#\')'), []);
+  assert.deepEqual(run("scripts/x.py", 'url = "https://velicoach.com/a#b"'), []);
+  assert.deepEqual(run("scripts/x.py", "import os  # noqa: F401"), []);
+  assert.deepEqual(run("scripts/x.py", "x = 1  # why: 上游接口少给一个字段"), []);
+  assert.deepEqual(run("scripts/x.sh", "#!/usr/bin/env bash"), []);
+  assert.deepEqual(run("scripts/x.sh", 'echo "${#arr[@]}" ${#name} $# ${path##*/}'), []);
+  assert.deepEqual(run("scripts/x.sh", "curl https://velicoach.com/a#b"), []);
+  assert.deepEqual(run("scripts/x.sh", "echo '# 不是注释' \"#\""), []);
+  assert.deepEqual(run("scripts/x.sh", "echo $((16#ff))"), []);
+  assert.deepEqual(run("scripts/x.yml", "color: '#fff'"), []);
+});
+
 test("配置之外的路径和换行的乘号不管", () => {
   assert.deepEqual(run("docs/a.md", "// 随便写"), []);
   assert.deepEqual(run("src/a.ts", "const x = a", "  * b;"), []);
