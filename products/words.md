@@ -24,7 +24,7 @@
 ## 怎么交付
 
 - **入口：** [AGENTS.md](https://github.com/madlouse/zhongkao-word-atlas/blob/main/AGENTS.md)。
-- **完成：** `bash scripts/lint-app-u.sh` 和 app-u 的 `npm test` 通过；`node scripts/check-trace.mjs` 通过；改了需求的同步更新 PRD 和追溯表；界面改动附截图；合并前跑文档先行和注释两项共享检查（这个仓库还没有 CI，见[工程规范](../standards/engineering.md)「文档先行」第 4 条）。
+- **完成：** `bash scripts/lint-app-u.sh` 和 app-u 的 `npm test` 通过；`node scripts/check-trace.mjs` 通过；改了需求的同步更新 PRD 和追溯表；界面改动附截图；文档先行和注释两项共享检查由 PR 上的 `velicoach-checks` 工作流跑（`.github/workflows/velicoach-checks.yml`，是本手册 `scripts/checks.workflow.yml` 的副本，见[工程规范](../standards/engineering.md)「文档先行」第 4 条）。
 - **执行位置：** 构建、测试、截图只在 box 或 Mac mini 上跑，不在 MacBook Pro 上。
 - **托管：** Cloudflare Pages；独立的 Supabase。频道 words。
 
