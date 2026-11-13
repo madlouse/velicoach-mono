@@ -154,7 +154,11 @@ for (const { repo, file } of PRODUCTS) {
           if (!Array.isArray(list) || list.length === 0) problems.push(`${repo}: ${CONFIG} ${section} needs a non-empty ${key} list`);
           else for (const re of list) new RegExp(re);
         }
-        if (section === "e2eTrace") new RegExp(config.e2eTrace.id ?? "(?!)");
+        if (section === "e2eTrace") {
+          const id = config.e2eTrace.id;
+          if (typeof id !== "string" || !id.trim()) problems.push(`${repo}: ${CONFIG} e2eTrace needs an id pattern for PRD numbers`);
+          else new RegExp(id);
+        }
       }
     } catch (e) {
       problems.push(`${repo}: ${CONFIG} does not parse: ${e.message}`);

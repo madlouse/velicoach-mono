@@ -4,14 +4,19 @@ import { readFileSync, realpathSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const idsIn = (text, re) => new Set([...text.matchAll(new RegExp(re, "g"))].map((m) => m[1] ?? m[0]));
+const idsIn = (text, re) => new Set([...text.matchAll(new RegExp(re, "g"))].map((m) => m[1] ?? m[0]).filter(Boolean));
+
+export const CASE_REF = /\b(?:test|it|describe|scenario)(?:\.(?!skip\b|todo\b|fixme\b)\w+)*\(\s*(["'`])((?:(?!\1)[^\\]|\\.)*)\1|\bprd["']?\s*[:=]\s*(\[[^\]]*\]|["'`][^"'`\n]*["'`])/g;
+
+export const caseRefs = (text) => [...text.matchAll(CASE_REF)].map((m) => m[2] ?? m[3]).join("\n");
 
 export function judge({ config, files }) {
+  if (typeof config.id !== "string" || !config.id.trim()) return { ok: false, summary: "e2eTrace 没配 id", missing: [], problems: ["e2eTrace.id 要写一个匹配 PRD 编号的正则，比如 \\b(F\\d{2})\\b"] };
   const pick = (list) => files.filter((f) => (list ?? []).some((s) => new RegExp(s).test(f.path)));
   const prd = new Set();
   for (const f of pick(config.prd)) for (const id of idsIn(f.text, config.id)) prd.add(id);
   const cited = new Map();
-  for (const f of pick(config.cases)) for (const id of idsIn(f.text, config.id)) cited.set(id, [...(cited.get(id) ?? []), f.path]);
+  for (const f of pick(config.cases)) for (const id of idsIn(caseRefs(f.text), config.id)) cited.set(id, [...(cited.get(id) ?? []), f.path]);
   const exempt = config.exempt ?? {};
   const problems = [];
   for (const [id, where] of cited) if (!prd.has(id)) problems.push(`${where[0]} 引用的 ${id} 在 PRD 里不存在：改成现有的条目，或先改 PRD`);
