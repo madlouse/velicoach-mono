@@ -35,7 +35,7 @@ Velicoach 是 AGI 路上的陪练：先站稳（Veli），再看清（主站文�
 | E2E、验收、覆盖率 | [verify/README.md](verify/README.md) |
 | 对外文字、术语 | [standards/content.md](standards/content.md)、[glossary.md](glossary.md) |
 | 改账号、路由、token、MCP 工具、反馈库 | [map/repos.md](map/repos.md) 的共享契约，再读 adr/ |
-| 派活、选模型 | [contracts/task.md](contracts/task.md) |
+| 派活、选模型、要人定的取舍 | [contracts/task.md](contracts/task.md) |
 | 定价、广告；排期 | [business.md](business.md)；[roadmap.md](roadmap.md) |
 | 改跨产品规范、契约、共享脚本 | [contracts/spec-change.md](contracts/spec-change.md)，记录在 [spec-log.md](contracts/spec-log.md) |
 | 在本手册加文档、调结构 | [ADR-0004](adr/0004-how-agents-read-the-handbook.md) |
