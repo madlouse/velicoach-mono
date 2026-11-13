@@ -1,0 +1,30 @@
+name: velicoach-checks
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: doc-first and comments
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          printf '%s\n' "$BODY" > "$RUNNER_TEMP/body.txt"
+          status=0
+          for check in check-doc-first check-comments; do
+            if git show "$BASE:scripts/$check.mjs" > "$RUNNER_TEMP/$check.mjs" 2>/dev/null; then
+              node "$RUNNER_TEMP/$check.mjs" "$BASE" "$HEAD_SHA" "$RUNNER_TEMP/body.txt" || status=1
+            else
+              echo "$check: base has no scripts/$check.mjs yet, skipped"
+            fi
+          done
+          exit $status
