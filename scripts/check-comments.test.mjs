@@ -90,6 +90,23 @@ test("指令或 why 后面夹带普通注释不通过", () => {
   assert.equal(run("supabase/m.sql", "select 1;  -- noqa 随便").length, 1);
 });
 
+test("类型注释、eslint 配置和 deno 规则名只认合法写法", () => {
+  assert.deepEqual(run("scripts/x.py", "d = {}  # type: Dict[str, int]"), []);
+  assert.deepEqual(run("scripts/x.py", "f = g  # type: (int, str) -> bool"), []);
+  assert.deepEqual(run("scripts/x.py", "x = None  # type: Optional[int] | None"), []);
+  assert.deepEqual(run("scripts/x.py", "cb = h  # type: Callable[[int], str]"), []);
+  assert.deepEqual(run("src/a.ts", '/* eslint quotes: ["error", "double"], max-len: ["error", 120] */'), []);
+  assert.deepEqual(run("src/a.ts", "// deno-lint-ignore no-explicit-any eqeqeq"), []);
+  assert.equal(run("scripts/x.py", "# type: TODO fix this later").length, 1);
+  assert.equal(run("scripts/x.py", "x = f()  # type: ignore this line because upstream is slow").length, 1);
+  assert.equal(run("scripts/x.sh", "# type: run this after deploy").length, 1);
+  assert.equal(run("scripts/x.yml", "# type: List[int]").length, 1);
+  assert.equal(run("scripts/x.py", "# mypy: anything").length, 1);
+  assert.equal(run("src/a.ts", "/* eslint no-console: [anything at all here] */").length, 1);
+  assert.equal(run("src/a.ts", "// deno-lint-ignore this is a normal english comment").length, 1);
+  assert.equal(run("src/a.ts", "// global hack").length, 1);
+});
+
 test("配置之外的路径和换行的乘号不管", () => {
   assert.deepEqual(run("docs/a.md", "// 随便写"), []);
   assert.deepEqual(run("src/a.ts", "const x = a", "  * b;"), []);
