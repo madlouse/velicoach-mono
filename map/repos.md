@@ -23,7 +23,7 @@
 | 设计语言与 token | 各自维护，规则见 [standards/design.md](../standards/design.md) | 改共享外壳、登录、设计系统时通知其他频道 |
 | Agent 内核 | thin-muscle-coach（ADR-0036） | `AgentKernel` 接口和 Pi 适配器、网关配置结构、花费账本结构抽成一个小包，Veli 和种星词钉同一版本、跑同一组一致性测试；运行时、数据库、工具和护栏各自独立。改动通知 words 频道 |
 | 主站进 Veli 的来源参数 | thin-muscle-coach | 主站链到 `/body` 一律带 `utm_source`：点击为 `velicoach`，扫码为 `velicoach_qr`；Veli 照现有埋点记进 `landing_view` 和 `signup_completed.channel`〔验证：主站 E2E 点击、扫码各走一次，Veli 埋点取值对得上〕 |
-| 主站登录入口 | thin-muscle-coach（路由表 ADR-0032） | 主站首页的登录入口链到 Veli 的 `/auth/google`、`/auth/apple`〔验证：主站 E2E 点两个入口，各进对应的登录〕 |
+| 主站登录入口 | thin-muscle-coach（路由表 ADR-0032） | 主站首页的登录入口链到 Veli 的 `/auth/google`、`/auth/apple`，同样带 `utm_source=velicoach`（扫码进来的仍是 `velicoach_qr`）；Veli 的 `/auth/*` 在登录跳转中保留这个参数，直到记进 `signup_completed.channel`〔验证：主站 E2E 点两个入口，各进对应的登录，新账号的 `channel` 是 `velicoach`〕 |
 | 智能体工具（MCP） | thin-muscle-coach | 工具名、入参、能返回什么字段见 [ADR-0003](../adr/0003-agent-access-boundary.md) |
 | 反馈库 | 运营频道开之前由各产品自管 | 每条反馈都有结果并告诉用户 |
 | 任务交接 | 本仓库 | [contracts/task.md](../contracts/task.md) |
