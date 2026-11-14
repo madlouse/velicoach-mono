@@ -18,7 +18,7 @@
 
 〔检查：主站画板由 `check_veli_links.py` 扫每个去 Veli 的 href 都带 `utm_source`（随 [velicoach#165](https://github.com/madlouse/velicoach/pull/165) 加入，`rebuild.sh` 调用，还没进 CI），站稳页语言切换链接除外；取值校验在主站和 Veli 各有单测，站点代码的测试随主站实现补。透传和会话存储还没有检查，靠下面的验证〕
 
-〔验证：本页地址没带来源时普通点击，新建的账号 `channel` 为 `velicoach`；从 `/?utm_source=reddit` 进主站首页再去 Veli 注册，为 `reddit`；本页地址没带来源时扫主站的码，或本次访问没带来源时在 Veli 页面扫码，为 `velicoach_qr`；本次访问带 `reddit` 进 Veli，之后在任一 Veli 页面扫码或切换语言后注册，仍为 `reddit`；`utm_source` 带空格或超长时按没带处理；从订阅邮件点进来新建的账号为 `velicoach`〕
+〔验证：本页地址没带来源时普通点击，新建的账号 `channel` 为 `velicoach`；从 `/?utm_source=reddit` 进主站首页再去 Veli 注册，为 `reddit`；本页地址没带来源时扫主站的码，或本次访问没带来源时在 Veli 页面扫码，为 `velicoach_qr`；本次访问带 `reddit` 进 Veli，之后在任一 Veli 页面扫码或切换语言后注册，仍为 `reddit`；`utm_source` 为空、带空格、带大写或超长时按没带处理；从订阅邮件点进来新建的账号为 `velicoach`〕
 
 ## 2. 主站「开始训练」的埋点取值
 
